@@ -1,0 +1,114 @@
+# ==========================================
+# 1. Credentials & Secrets (CRITICAL)
+# ==========================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+credentials.json
+client_secret.json
+
+# ==========================================
+# 2. Data & Datasets
+# ==========================================
+# Ignore the entire data directory's contents, but not the directory itself
+data/*
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Ignore common massive data formats anywhere in the repo
+*.csv
+*.tsv
+*.dat
+*.jsonl
+*.parquet
+*.h5
+*.hdf5
+*.nc
+*.pkl
+*.pickle
+
+# ==========================================
+# 3. AI / ML Models & Checkpoints
+# ==========================================
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+*.onnx
+*.pb
+*.tflite
+*.weights
+*.h5
+
+# Machine Learning experiment tracking
+wandb/
+.neptune/
+mlruns/
+lightning_logs/
+huggingface/
+
+# ==========================================
+# 4. Jupyter & IPython
+# ==========================================
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+profile_default/
+ipython_config.py
+*.html
+
+# ==========================================
+# 5. Python Environment & Build Artifacts
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ==========================================
+# 6. Virtual Environments
+# ==========================================
+.env/
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+conda_env/
+
+# ==========================================
+# 7. IDE & OS Metadata
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
