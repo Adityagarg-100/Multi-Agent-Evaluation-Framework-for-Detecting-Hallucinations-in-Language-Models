@@ -1,9 +1,17 @@
 import warnings
+
+from Project.src.hallucination_supervisor.agents.judge import NLIVerifier
 warnings.filterwarnings("ignore", category=ResourceWarning)
 
 import sys
 import time
 from pathlib import Path
+
+from src.hallucination_supervisor.agents import (
+    BaseDraftGenerator,
+    ClaimExtractor,
+    EvidenceInvestigator
+)
 
 from src.hallucination_supervisor.pipeline import SupervisorPipeline
 from rich.console import Console
@@ -17,22 +25,23 @@ def run_evaluation(prompt: str):
     console.print(Panel(f"[bold cyan]Input Prompt:[/bold cyan]\n{prompt}", title="Task Started"))
 
     # Initialize the pipeline
-    pipeline = SupervisorPipeline()
+    pipeline = SupervisorPipeline(generator=BaseDraftGenerator(provider="openai", model_name="gpt-4o"),
+    extractor=ClaimExtractor(provider="ollama", model_name="llama3.1:8b"),
+    investigator=EvidenceInvestigator(provider="ollama", model_name="llama3.1:8b"),
+    judge=NLIVerifier(provider="ollama", model_name="gemma2:9b"),
+)
 
     with console.status("[bold green]Agent Pipeline Running... (This may take 10-30 seconds)[/bold green]"):
         start_time = time.time()
         try:
-            # Execute the pipeline — use the detailed entry point so we get
-            # claims + verdicts back, not just the aggregated report.
             result = pipeline.run_verification_detailed(prompt)
         except Exception as e:
             console.print(f"[bold red]Pipeline Failed:[/bold red] {e}")
             return
 
     execution_time = time.time() - start_time
-    report = result.report  # the aggregated VerificationReport still lives here
+    report = result.report
 
-    # Print the Original Draft
     console.print("\n[bold yellow]Base Generator Draft:[/bold yellow]")
     console.print(result.draft)
     print("\n" + "="*50 + "\n")
@@ -49,13 +58,13 @@ def run_evaluation(prompt: str):
         for claim in result.claims:
             verdict = result.verdict_for(claim.claim_id)
             if verdict is None:
-                continue  # defensive: shouldn't happen, but don't crash the table on it
+                continue  # shouldn't happen
 
             status_color = "green" if verdict.status == "SUPPORTED" else "red" if verdict.status == "CONTRADICTED" else "yellow"
 
             table.add_row(
-                verdict.claim_id[:8],          # ClaimVerdict has claim_id, not claim_text
-                claim.text,                     # claim text comes from the AtomicClaim, not the verdict
+                verdict.claim_id[:8],          # ClaimVerdict has claim_id
+                claim.text,                     # claim text comes from the AtomicClaim
                 f"[bold {status_color}]{verdict.status}[/bold {status_color}]",
                 f"{verdict.confidence_score * 100:.0f}%",
                 verdict.rationale
