@@ -1,1 +1,1 @@
-# Multi-Agent-Evaluation-Framework-for-Detecting-Hallucinations-in-Language-Models
+# Multi Agent Evaluation Framework for Detecting Hallucinations in Language Models
